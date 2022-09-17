@@ -1,0 +1,14 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Themes/Styles/ScrollViewer.xaml" />
+
+        <ResourceDictionary Source="/Themes/Styles/TextBox.xaml" />
+        <ResourceDictionary Source="/Themes/Styles/CheckBox.xaml" />
+        <ResourceDictionary Source="/Themes/Styles/ToggleButton.xaml" />
+
+        <ResourceDictionary Source="/Themes/Styles/Window.xaml" />
+
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>
