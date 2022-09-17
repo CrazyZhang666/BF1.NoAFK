@@ -79,7 +79,7 @@ public static class Bf1Util
         try
         {
             RegistryKey local = Registry.LocalMachine;
-            RegistryKey runs = local.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+            RegistryKey runs = local.OpenSubKey(@"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", true);
             if (runs == null)
             {
                 RegistryKey key2 = local.CreateSubKey("SOFTWARE");
@@ -117,10 +117,10 @@ public static class Bf1Util
         try
         {
             RegistryKey local = Registry.LocalMachine;
-            RegistryKey key = local.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+            RegistryKey key = local.OpenSubKey(@"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", true);
             if (key == null)
             {
-                local.CreateSubKey("SOFTWARE//Microsoft//Windows//CurrentVersion//Run");
+                local.CreateSubKey(@"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run");
             }
             if (isStart)
             {

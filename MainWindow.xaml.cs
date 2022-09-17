@@ -1,6 +1,8 @@
 ﻿using BF1.NoAFK.Core;
 using BF1.NoAFK.Utils;
 
+using Hardcodet.Wpf.TaskbarNotification;
+
 namespace BF1.NoAFK;
 
 /// <summary>
@@ -12,10 +14,6 @@ public partial class MainWindow
     /// 主窗口程序是否在运行
     /// </summary>
     private bool IsMainAppRunning = true;
-    /// <summary>
-    /// 是否激活工具
-    /// </summary>
-    private bool IsActivateTool = false;
 
     /// <summary>
     /// 挂机防踢定时器
@@ -37,12 +35,12 @@ public partial class MainWindow
         if (CheckBox_ShowLogger.IsChecked == true)
         {
             TextBox_Logger.Visibility = Visibility.Visible;
-            Window_Main.Height = 500;
+            Window_Main.Height = 400;
         }
         else
         {
             TextBox_Logger.Visibility = Visibility.Collapsed;
-            Window_Main.Height = 83;
+            Window_Main.Height = 60;
         }
     }
 
@@ -69,8 +67,9 @@ public partial class MainWindow
 
     private void Window_Main_Closing(object sender, CancelEventArgs e)
     {
+        TaskbarIcon_Main.Dispose();
+
         IsMainAppRunning = false;
-        IsActivateTool = false;
         TimerNoAFK.Stop();
         Bf1Mem.CloseHandle();
 
@@ -101,49 +100,37 @@ public partial class MainWindow
                 TextBlock_AppRunTime.Text = $"运行时间 : {Bf1Util.ExecDateDiff(Origin_DateTime, DateTime.Now)}";
             });
 
-            if (IsActivateTool)
+            // 判断战地1是否在运行
+            if (!Bf1Util.IsBf1Run())
             {
-                // 判断战地1是否在运行
-                if (!Bf1Util.IsBf1Run())
-                {
-                    // 关闭战地1进程句柄
-                    Bf1Mem.CloseHandle();
-                    continue;
-                }
+                // 关闭战地1进程句柄
+                Bf1Mem.CloseHandle();
+                continue;
+            }
 
-                if (Bf1Mem.Bf1ProHandle == IntPtr.Zero)
-                {
-                    // 代表刚刚发现战地1进程，尚未初始化
-                    AppendLogger("发现战地1进程，正在初始化...");
+            if (Bf1Mem.Bf1ProHandle == IntPtr.Zero)
+            {
+                // 代表刚刚发现战地1进程，尚未初始化
+                AppendLogger("发现战地1进程，正在初始化...");
 
-                    // 初始化战地1进程
-                    if (Bf1Mem.Initialize())
-                    {
-                        AppendLogger("战地1内存模块初始化成功");
-                        AppendLogger("正在等待玩家进入服务器...");
-                        RunNoAFK();
-                    }
-                    else
-                    {
-                        Bf1Mem.CloseHandle();
-                        AppendLogger("战地1内存模块初始化失败");
-                        return;
-                    }
+                // 初始化战地1进程
+                if (Bf1Mem.Initialize())
+                {
+                    AppendLogger("战地1内存模块初始化成功");
+                    AppendLogger("正在等待玩家进入服务器...");
+                    RunNoAFK();
                 }
                 else
                 {
-                    // 代表刚刚发现战地1已经被初始化过
-                    RunNoAFK();
+                    Bf1Mem.CloseHandle();
+                    AppendLogger("战地1内存模块初始化失败");
+                    return;
                 }
             }
             else
             {
-                if (!TimerNoAFK.Enabled && Bf1Mem.Bf1ProHandle != IntPtr.Zero)
-                {
-                    // 关闭挂机防踢功能
-                    TimerNoAFK.Start();
-                    AppendLogger("工具已关闭，游戏内挂机防踢功能已停止");
-                }
+                // 代表刚刚发现战地1已经被初始化过
+                RunNoAFK();
             }
 
             Thread.Sleep(1000);
@@ -238,35 +225,58 @@ public partial class MainWindow
         if (CheckBox_ShowLogger.IsChecked == true)
         {
             TextBox_Logger.Visibility = Visibility.Visible;
-            Window_Main.Height = 500;
+            Window_Main.Height = 400;
         }
         else
         {
             TextBox_Logger.Visibility = Visibility.Collapsed;
-            Window_Main.Height = 83;
+            Window_Main.Height = 60;
         }
 
         Properties.Settings.Default.IsShowLogger = CheckBox_ShowLogger.IsChecked == true;
     }
 
     /// <summary>
-    /// 激活工具
+    /// 显示主窗口
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ToggleButton_ActivateTool_Click(object sender, RoutedEventArgs e)
+    private void MenuItem_ShowMainWindow_Click(object sender, RoutedEventArgs e)
     {
-        if (ToggleButton_ActivateTool.IsChecked == true)
+        if (WindowState == WindowState.Minimized)
         {
-            IsActivateTool = true;
-            AppendLogger("工具已激活");
-            Console.Beep(700, 75);
+            WindowState = WindowState.Normal;
+            Activate();
+            ShowInTaskbar = true;
         }
-        else
+    }
+
+    /// <summary>
+    /// 退出程序
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void MenuItem_ExitProcess_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void Window_Main_StateChanged(object sender, EventArgs e)
+    {
+        if (WindowState == WindowState.Minimized)
         {
-            IsActivateTool = false;
-            AppendLogger("工具已关闭");
-            Console.Beep(600, 75);
+            ShowInTaskbar = false;
+            TaskbarIcon_Main.ShowBalloonTip("提示", "工具已最小化到系统托盘，请使用托盘图标右键退出程序", BalloonIcon.Info);
+        }
+    }
+
+    private void TaskbarIcon_Main_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+    {
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+            Activate();
+            ShowInTaskbar = true;
         }
     }
 }

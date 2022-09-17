@@ -4,19 +4,34 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tb="http://www.hardcodet.net/taskbar"
     xmlns:ui="clr-namespace:BF1.NoAFK.Themes.Controls"
     x:Name="Window_Main"
     Title="战地1暖服机器人自动挂机工具"
     Width="350"
-    Height="500"
+    Height="400"
     CaptionHeight="30"
     Closing="Window_Main_Closing"
     Loaded="Window_Main_Loaded"
     ResizeMode="CanMinimize"
+    StateChanged="Window_Main_StateChanged"
     Style="{StaticResource UiWindowStyle}"
     SystemButtonSize="30"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+
+    <Window.Resources>
+        <ContextMenu x:Key="ContextMenu_NotifyIcon">
+            <MenuItem
+                x:Name="MenuItem_ShowMainWindow"
+                Click="MenuItem_ShowMainWindow_Click"
+                Header="显示主窗口" />
+            <MenuItem
+                x:Name="MenuItem_ExitProcess"
+                Click="MenuItem_ExitProcess_Click"
+                Header="退出程序" />
+        </ContextMenu>
+    </Window.Resources>
 
     <ui:UiWindow.TitleContent>
         <StackPanel
@@ -39,43 +54,47 @@
     </ui:UiWindow.TitleContent>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-
-        <UniformGrid Grid.Row="0" Columns="2">
-            <StackPanel VerticalAlignment="Center">
+        <tb:TaskbarIcon
+            x:Name="TaskbarIcon_Main"
+            ContextMenu="{StaticResource ContextMenu_NotifyIcon}"
+            IconSource="/Assets/Images/NoAFK.ico"
+            MenuActivation="LeftOrRightClick"
+            ToolTipText="战地1暖服机器人自动挂机工具"
+            TrayMouseDoubleClick="TaskbarIcon_Main_TrayMouseDoubleClick" />
+        <!--  ##########  -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <!--  ##########  -->
+            <DockPanel Grid.Row="0" LastChildFill="False">
                 <CheckBox
                     x:Name="CheckBox_RunAtStart"
                     Click="CheckBox_RunAtStart_Click"
-                    Content="开机自启" />
+                    Content="开机自启"
+                    DockPanel.Dock="Left" />
                 <CheckBox
                     x:Name="CheckBox_ShowLogger"
-                    Margin="5,0,5,5"
                     Click="CheckBox_ShowLogger_Click"
                     Content="显示日志"
+                    DockPanel.Dock="Left"
                     IsChecked="True" />
-            </StackPanel>
-            <StackPanel VerticalAlignment="Center">
                 <TextBlock
                     x:Name="TextBlock_AppRunTime"
                     Margin="5"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"
                     Text="运行时间 : 00:00:00" />
-                <ToggleButton
-                    x:Name="ToggleButton_ActivateTool"
-                    Margin="5,0,5,5"
-                    Click="ToggleButton_ActivateTool_Click"
-                    Content="激活工具" />
-            </StackPanel>
-        </UniformGrid>
-
-        <TextBox
-            x:Name="TextBox_Logger"
-            Grid.Row="1"
-            Margin="5,0,5,5"
-            Padding="5"
-            Style="{StaticResource TextBoxStyle_Logger}" />
+            </DockPanel>
+            <!--  ##########  -->
+            <TextBox
+                x:Name="TextBox_Logger"
+                Grid.Row="1"
+                Margin="5,0,5,5"
+                Padding="5"
+                Style="{StaticResource TextBoxStyle_Logger}" />
+        </Grid>
     </Grid>
 
 </ui:UiWindow>

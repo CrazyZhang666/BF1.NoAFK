@@ -8,6 +8,7 @@
         <ResourceDictionary Source="/Themes/Styles/ToggleButton.xaml" />
 
         <ResourceDictionary Source="/Themes/Styles/Window.xaml" />
+        <ResourceDictionary Source="/Themes/Styles/ContextMenu.xaml" />
 
     </ResourceDictionary.MergedDictionaries>
 
